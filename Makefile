@@ -1,7 +1,9 @@
+ECRREPO?=nmohamedabdulla
 NAME := network-tools
-TAG := dev
+TAG := 0.1.0
 
-IMAGE_NAME = $(NAME):$(TAG)
+
+IMAGE_NAME = hub.tess.io/${ECRREPO}/$(NAME):$(TAG)
 
 .PHONY: default
 default: help
@@ -14,7 +16,10 @@ lint: ## Lints the Dockerfile
 	@docker run --rm --interactive --env "HADOLINT_IGNORE=DL3013,DL3018" hadolint/hadolint < Dockerfile
 
 build: ## Builds a local dev image (network-tools:dev)
-	@docker build --tag "$(IMAGE_NAME)" .
+	@docker build --no-cache --tag "$(IMAGE_NAME)" .
+
+push:
+	@docker push $(IMAGE_NAME)
 
 .PHONY: run
 run: ## Runs the container a terminal session

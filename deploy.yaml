@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: network-tools
+  annotations:
+  name: network-tools
+  namespace: lnptnetscale-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: network-tools
+  template:
+    metadata:
+      annotations:
+        models.tess.io/cms-requested: "false"
+      labels:
+        app: network-tools
+    spec:
+      containers:
+      - command:
+        - /bin/sleep
+        args:
+        - "600"
+        env:
+        - name: MY_POD_NAME
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.name
+        - name: MY_POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: metadata.namespace
+        - name: MY_POD_IP
+          valueFrom:
+            fieldRef:
+              apiVersion: v1
+              fieldPath: status.podIP
+        image: hub.tess.io/nmohamedabdulla/network-tools:0.1.0
+        imagePullPolicy: Always
+        name: network-tools
+        volumeMounts:
+        - mountPath: /network-tools-load/config
+          name: kubeconfig
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 119987
+      volumes:
+      - name: kubeconfig
+        secret:
+          defaultMode: 420
+          secretName: gen-data-kubeconfig
